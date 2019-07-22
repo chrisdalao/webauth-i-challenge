@@ -6,7 +6,7 @@ Auth = require('./auth-model.js');
 router.post('/register', (req, res) => {
     let user = req.body;
 
-    if (user) {
+    if (user.username && user.password) {
         const hash = bcrypt.hashSync(user.password, 8)
         user.password = hash;
         Auth.add(user)
@@ -14,11 +14,10 @@ router.post('/register', (req, res) => {
                 res.status(201).json(saved);
             })
             .catch(error => {
-                res.status(401).json({ message: "Please provide a username and password" });
+                res.status(401).json({ message: "That username already exists" });
             });
     } else {
-        res.status(500).json({ message: "There was an error registering user" });
-
+        res.status(500).json({ message: "Please provide a username and password" });
     }
 });
 
