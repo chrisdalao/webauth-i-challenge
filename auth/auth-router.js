@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
-Auth = require('./auth-model.js');
+Users = require('../users/users-model.js');
 
 router.post('/register', (req, res) => {
     let user = req.body;
@@ -9,7 +9,7 @@ router.post('/register', (req, res) => {
     if (user.username && user.password) {
         const hash = bcrypt.hashSync(user.password, 8)
         user.password = hash;
-        Auth.add(user)
+        Users.add(user)
             .then(saved => {
                 res.status(201).json(saved);
             })
@@ -23,8 +23,8 @@ router.post('/register', (req, res) => {
 
 router.post('/login', (req, res) => {
     let { username, password } = req.body;
-
-    Auth.findBy({ username })
+    Users
+    Users.findBy({ username })
         .first()
         .then(user => {
             if (user && bcrypt.compareSync(password, user.password)) {
@@ -39,7 +39,7 @@ router.post('/login', (req, res) => {
 });
 
 router.get('/users', authenticate, (req, res) => {
-    Auth.find()
+    Users.find()
         .then(users => {
             res.json(users);
         })
@@ -49,7 +49,7 @@ router.get('/users', authenticate, (req, res) => {
 function authenticate(req, res, next) {
     const { username, password } = req.headers;
 
-    Auth.findBy({ username })
+    Users.findBy({ username })
         .first()
         .then(user => {
             if (user && bcrypt.compareSync(password, user.password)) {
